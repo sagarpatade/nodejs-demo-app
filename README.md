@@ -1,5 +1,3 @@
-# nodejs-demo-app
-
 # Node.js Demo App CI/CD Pipeline
 
 ## 🚀 Objective
