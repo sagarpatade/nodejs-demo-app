@@ -47,9 +47,21 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                sh 'docker run -d -p 3000:3000 $IMAGE_NAME'
-            }
-        }
+    steps {
+        sh '''
+            # Stop any container using port 3000
+            docker ps --filter "publish=3000" --format "{{.ID}}" | xargs -r docker stop || true
+            docker ps -a --filter "publish=3000" --format "{{.ID}}" | xargs -r docker rm || true
+
+            # Or explicitly stop/remove by name
+            docker stop nodejs-demo-app || true
+            docker rm nodejs-demo-app || true
+
+            # Run new container
+            docker run -d -p 3000:3000 --name nodejs-demo-app $IMAGE_NAME
+        '''
+    }
+}
+
     }
 }
