@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "sagarpatade1900/nodejs-demo-app"
+        IMAGE_NAME = "sagarpatade1900/nodejs-demo-app:${BUILD_NUMBER}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/sagarpatade/nodejs-demo-app.git'
+                git branch: 'main', url: 'https://github.com/sagarpatade/nodejs-demo-app.git'
             }
         }
 
@@ -45,6 +45,16 @@ pipeline {
             steps {
                 sh 'docker run -d -p 3000:3000 $IMAGE_NAME'
             }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker ps -a'
+            sh 'docker images'
+        }
+        cleanup {
+            sh 'docker system prune -f'
         }
     }
 }
