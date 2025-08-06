@@ -5,12 +5,12 @@ pipeline {
         IMAGE_NAME = "sagarpatade1900/nodejs-demo-app"
     }
 
-    stage('Checkout') {
-    steps {
-        git branch: 'main', url: 'https://github.com/sagarpatade/nodejs-demo-app.git'
-    }
-}
-
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sagarpatade/nodejs-demo-app.git'
+            }
+        }
 
         stage('Install Dependencies') {
             steps {
@@ -20,12 +20,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh '''
-                    nohup npm start &
-                    sleep 5
-                    npm test
-                    pkill node
-                '''
+                sh 'npm test'
             }
         }
 
@@ -50,14 +45,6 @@ pipeline {
             steps {
                 sh 'docker run -d -p 3000:3000 $IMAGE_NAME'
             }
-        }
-    }
-
-    post {
-        always {
-            sh 'docker ps -a'
-            sh 'docker images'
-            sh 'docker system prune -f'
         }
     }
 }
