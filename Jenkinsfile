@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/sagarpatade/nodejs-demo-app.git'
+                git 'https://github.com/sagarpatade/nodejs-demo-app.git'
             }
         }
 
@@ -19,15 +19,10 @@ pipeline {
         }
 
         stage('Test') {
-    steps {
-        sh '''
-            npm start &
-            sleep 5
-            npm test
-        '''
-    }
-}
-
+            steps {
+                sh 'npm test'
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -47,20 +42,23 @@ pipeline {
         }
 
         stage('Deploy') {
-    steps {
-        sh 
-            fuser -k 3000/tcp || true
+            steps {
+                sh '''
+                    # Kill process using port 3000 if running
+                    fuser -k 3000/tcp || true
 
-            docker ps --filter "publish=3000" --format "{{.ID}}" | xargs -r docker stop || true
-            docker ps -a --filter "publish=3000" --format "{{.ID}}" | xargs -r docker rm || true
+                    # Stop and remove existing containers using port 3000
+                    docker ps --filter "publish=3000" --format "{{.ID}}" | xargs -r docker stop || true
+                    docker ps -a --filter "publish=3000" --format "{{.ID}}" | xargs -r docker rm || true
 
-            docker stop nodejs-demo-app || true
-            docker rm nodejs-demo-app || true
+                    # Stop and remove container by name (if exists)
+                    docker stop nodejs-demo-app || true
+                    docker rm nodejs-demo-app || true
 
-            docker run -d -p 3000:3000 --name nodejs-demo-app $IMAGE_NAME
-        
-    }
-}
-
+                    # Run new container
+                    docker run -d -p 3000:3000 --name nodejs-demo-app $IMAGE_NAME
+                '''
+            }
+        }
     }
 }
