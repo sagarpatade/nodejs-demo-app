@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "sagarpatade1900/nodejs-demo-app:${BUILD_NUMBER}"
+        IMAGE_NAME = "sagarpatade1900/nodejs-demo-app"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/sagarpatade/nodejs-demo-app.git'
+                git 'https://github.com/sagarpatade/nodejs-demo-app.git'
             }
         }
 
@@ -20,7 +20,12 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'npm test'
+                sh '''
+                    nohup npm start &
+                    sleep 5
+                    npm test
+                    pkill node
+                '''
             }
         }
 
@@ -52,8 +57,6 @@ pipeline {
         always {
             sh 'docker ps -a'
             sh 'docker images'
-        }
-        cleanup {
             sh 'docker system prune -f'
         }
     }
