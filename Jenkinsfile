@@ -5,12 +5,12 @@ pipeline {
         IMAGE_NAME = "sagarpatade1900/nodejs-demo-app"
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/sagarpatade/nodejs-demo-app.git'
-            }
-        }
+    stage('Checkout') {
+    steps {
+        git branch: 'main', url: 'https://github.com/sagarpatade/nodejs-demo-app.git'
+    }
+}
+
 
         stage('Install Dependencies') {
             steps {
