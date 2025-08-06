@@ -19,10 +19,15 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
-                sh 'npm test'
-            }
-        }
+    steps {
+        sh '''
+            npm start &
+            sleep 5
+            npm test
+        '''
+    }
+}
+
 
         stage('Build Docker Image') {
             steps {
